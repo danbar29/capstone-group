@@ -1,5 +1,5 @@
 The website folder is the most updated Django project that has the login and registration form.
-Make sure to rund the following commands to install crispy forms: First cd into the folder "website" After in the website folder, run these commands: pip install django-crispy-forms
+Make sure to run the following commands to install crispy forms: First cd into the folder "website" After in the website folder, run these commands: pip install django-crispy-forms
 And then type the command: pip install crispy-bootstrap5
 
 To access the login form, type http://127.0.0.1:8000/login/
