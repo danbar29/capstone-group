@@ -11,6 +11,13 @@ def log_out(request):
 def home(request):
     return render(request, 'main/home.html')
 
+def donations(request):
+    return render(request, 'main/donations.html')
+
+def trends(request):
+    return render(request, 'main/trends.html')
+
+
 def sign_up(request):
     if request.method == 'POST':
         # populate form whatever data was
