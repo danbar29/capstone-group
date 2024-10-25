@@ -1,0 +1,31 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Add Transaction{% endblock %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Add Transaction</h2>
+
+    <!-- Display success messages here -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success mt-3">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Transaction Form -->
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}  <!-- Render form with crispy forms -->
+
+        <!-- Submit button for adding transaction -->
+        <button type="submit" class="btn btn-primary mt-3">Add Transaction</button>
+    </form>
+
+    <!-- Add another transaction button, shown only after a successful transaction -->
+    {% if messages %}
+        <a href="{% url 'add_transaction' %}" class="btn btn-secondary mt-3">Add Another Transaction</a>
+    {% endif %}
+</div>
+{% endblock %}

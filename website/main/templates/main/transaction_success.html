@@ -1,0 +1,14 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Transaction Added{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Transaction Added Successfully</h2>
+    <div class="alert alert-success mt-3">Transaction added successfully.</div>
+    <a href="{% url 'add_transaction' %}" class="btn btn-secondary mt-3">Add Another Transaction</a>
+</div>
+{% endblock %}
+
+
+

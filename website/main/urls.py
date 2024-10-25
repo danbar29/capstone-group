@@ -8,4 +8,7 @@ urlpatterns = [
     path("logout/",views.log_out, name="logout"),
     path("donations/",views.donations, name="donations"),
     path("trends/",views.trends, name="trends"),
+    path('add-transaction/', views.add_transaction, name='add_transaction'),
+    path('transaction-success/', views.transaction_success, name='transaction_success'),
+
 ]
