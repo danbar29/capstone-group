@@ -25,6 +25,7 @@ def sign_up(request):
     if request.method == 'POST':
         # populate form whatever data was
         form = RegisterForm(request.POST)
+        
         # if method is on form, validate it is correct
         if form.is_valid():
             user = form.save()
