@@ -1,6 +1,29 @@
 {% extends 'main/base.html' %}
-
-{% block title %}Home Page{% endblock %}
+{% block title %}Home{% endblock %}
 {% block content %}
-<h1>Home Page!</h1>
+<div class="container mt-4">
+    <h2>General Donations</h2>
+    <div class="card p-3">
+        <p>General Donations Total: ${{ general_total }}</p>
+        <div class="btn-group">
+            <a href="{% url 'view_general_transactions' %}" class="btn btn-primary">View Transactions</a>
+            <a href="{% url 'add_general_transaction' %}" class="btn btn-success">Add Transaction</a>
+        </div>
+    </div>
+    <h2 class="mt-5">Specific Projects</h2>
+    <a href="{% url 'create_project' %}" class="btn btn-primary mb-3">Create New Project</a>
+    {% for data in project_data %}
+    <div class="card p-3 mb-3">
+        <h4>{{ data.project.name }}</h4>
+        <p>Goal: ${{ data.project.goal_amount }}</p>
+        <p>Raised: ${{ data.total_raised }}</p>
+        <div class="btn-group">
+            <a href="{% url 'view_project_transactions' data.project.id %}" class="btn btn-primary">View Transactions</a>
+            <a href="{% url 'add_project_transaction' data.project.id %}" class="btn btn-success">Add Transaction</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}
+
+

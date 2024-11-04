@@ -8,7 +8,13 @@ urlpatterns = [
     path("logout/",views.log_out, name="logout"),
     path("donations/",views.donations, name="donations"),
     path("trends/",views.trends, name="trends"),
-    path('add-transaction/', views.add_transaction, name='add_transaction'),
-    path('transaction-success/', views.transaction_success, name='transaction_success'),
+    
+  
+    path('general-transactions/', views.view_general_transactions, name='view_general_transactions'),
+    path('add-general-transaction/', views.add_general_transaction, name='add_general_transaction'),
+    path('create-project/', views.create_project, name='create_project'),
+    path('project-transactions/<int:project_id>/', views.view_project_transactions, name='view_project_transactions'),
+    path('add-project-transaction/<int:project_id>/', views.add_project_transaction, name='add_project_transaction'),
+
 
 ]
