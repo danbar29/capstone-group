@@ -87,39 +87,47 @@ def view_project_transactions(request, project_id):
     })
 
 
+
+# Adjusting the add_general_transaction function
 def add_general_transaction(request):
     if request.method == 'POST':
         form = TransactionForm(request.POST)
         if form.is_valid():
             transaction = form.save(commit=False)
             transaction.fund = 'general'
+            if transaction.transaction_type == 'Debit':
+                transaction.amount = -transaction.amount  # If the transaction is debit, make the amount negative.
             transaction.save()
             messages.success(request, 'General transaction added successfully.')
-            # After saving the form, create a new instance of the form to clear fields
-            form = TransactionForm()  # This clears the form
+            return redirect('home')
     else:
         form = TransactionForm()
-
     return render(request, 'main/add_general_transaction.html', {'form': form})
 
+# Adjusting the add_project_transaction function
 def add_project_transaction(request, project_id):
     project = get_object_or_404(Project, id=project_id)
-
     if request.method == 'POST':
         form = TransactionForm(request.POST)
         if form.is_valid():
             transaction = form.save(commit=False)
             transaction.project = project
             transaction.fund = 'specific'
+            if transaction.transaction_type == 'Debit':
+                transaction.amount = -transaction.amount  # If the transaction is debit, make the amount negative.
             transaction.save()
             messages.success(request, f'Transaction added successfully to {project.name}.')
-            # Clear the form after saving by creating a new instance
-            form = TransactionForm()  # Clears the form
+            return redirect('home')
     else:
         form = TransactionForm()
-
     return render(request, 'main/add_project_transaction.html', {'form': form, 'project': project})
 
+# Updating the view transactions report page to reflect the debit color change
+def view_general_transactions(request):
+    transactions = Transaction.objects.filter(fund="general").annotate(
+        amount_color=Sum('amount')
+    )
+    return render(request, 'main/view_general_transactions.html', {'transactions': transactions})
 
 
 
