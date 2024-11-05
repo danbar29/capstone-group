@@ -19,7 +19,9 @@
         <p>Raised: ${{ data.total_raised }}</p>
         <div class="btn-group">
             <a href="{% url 'view_project_transactions' data.project.id %}" class="btn btn-primary">View Transactions</a>
+            {% if data.is_owner %}
             <a href="{% url 'add_project_transaction' data.project.id %}" class="btn btn-success">Add Transaction</a>
+            {% endif %}
         </div>
     </div>
     {% endfor %}

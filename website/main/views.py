@@ -1,14 +1,11 @@
-from .forms import RegisterForm
+from django.shortcuts import render, redirect
+from .forms import RegisterForm, TransactionForm, ProjectForm
+from .models import Transaction, Project
 from django.contrib.auth import login,logout, authenticate
-from .forms import TransactionForm
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
-
 from django.db.models import Sum
-from .models import Transaction, Project
-from .forms import TransactionForm, ProjectForm
-
-
+#from django.contrib.auth.decorators import login_required #if we want to go with decorators we could add @login_required
 
 # Create your views here.
 def log_out(request):
@@ -45,14 +42,15 @@ def sign_up(request):
 def home(request):
     general_total = Transaction.objects.filter(fund="general").aggregate(Sum('amount'))['amount__sum'] or 0
     projects = Project.objects.all()
-    
+
     # Prepare projects with their total donations
     project_data = []
     for project in projects:
         total_raised = project.transactions.aggregate(Sum('amount'))['amount__sum'] or 0
         project_data.append({
             'project': project,
-            'total_raised': total_raised
+            'total_raised': total_raised,
+            'is_owner': project.owner ==request.user
         })
     
     return render(request, 'main/home.html', {
@@ -64,13 +62,14 @@ def view_general_transactions(request):
     transactions = Transaction.objects.filter(fund="general")
     return render(request, 'main/view_general_transactions.html', {'transactions': transactions})
 
-
-
+#create a new project
 def create_project(request):
     if request.method == 'POST':
         form = ProjectForm(request.POST)
         if form.is_valid():
-            form.save()
+            project = form.save(commit=False) #not saving yet so we can fetch the user
+            project.owner = request.user
+            project.save() #now we push it to the databse with the associated user
             messages.success(request, 'Project created successfully.')
             return redirect('home')
     else:
@@ -105,6 +104,7 @@ def add_general_transaction(request):
 
 def add_project_transaction(request, project_id):
     project = get_object_or_404(Project, id=project_id)
+
     if request.method == 'POST':
         form = TransactionForm(request.POST)
         if form.is_valid():
