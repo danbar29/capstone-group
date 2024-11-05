@@ -12,9 +12,6 @@ def log_out(request):
     logout(request)
     return redirect("/login/")
 
-#def home(request):
- #   return render(request, 'main/home.html')
-
 def donations(request):
     return render(request, 'main/donations.html')
 
@@ -38,25 +35,28 @@ def sign_up(request):
 
     return render(request, 'registration/sign_up.html', {"form": form} )
 
-
 def home(request):
     general_total = Transaction.objects.filter(fund="general").aggregate(Sum('amount'))['amount__sum'] or 0
     projects = Project.objects.all()
-
-    # Prepare projects with their total donations
+    
+    # Prepare projects with their total donations and calculate progress
     project_data = []
     for project in projects:
         total_raised = project.transactions.aggregate(Sum('amount'))['amount__sum'] or 0
+        progress_percentage = (total_raised / project.goal_amount) * 100 if project.goal_amount > 0 else 0
         project_data.append({
             'project': project,
             'total_raised': total_raised,
+            'progress_percentage': round(progress_percentage, 2),
             'is_owner': project.owner ==request.user
+
         })
     
     return render(request, 'main/home.html', {
         'general_total': general_total,
         'project_data': project_data
     })
+
 
 
 def create_project(request):
