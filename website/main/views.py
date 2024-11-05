@@ -58,37 +58,22 @@ def home(request):
         'project_data': project_data
     })
 
-def view_general_transactions(request):
-    transactions = Transaction.objects.filter(fund="general")
-    return render(request, 'main/view_general_transactions.html', {'transactions': transactions})
 
-#create a new project
 def create_project(request):
     if request.method == 'POST':
         form = ProjectForm(request.POST)
         if form.is_valid():
-            project = form.save(commit=False) #not saving yet so we can fetch the user
+            project = form.save(commit=False)  # Not saving yet to fetch the user.
             project.owner = request.user
-            project.save() #now we push it to the databse with the associated user
+            project.save()  # Now we push it to the database with the associated user.
             messages.success(request, 'Project created successfully.')
-            return redirect('home')
+            return redirect('create_project')  # Redirect to refresh the page and clear fields.
     else:
         form = ProjectForm()
     return render(request, 'main/create_project.html', {'form': form})
 
-def view_project_transactions(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
-    transactions = project.transactions.all()
-    total_raised = transactions.aggregate(Sum('amount'))['amount__sum'] or 0
-    return render(request, 'main/view_project_transactions.html', {
-        'project': project,
-        'transactions': transactions,
-        'total_raised': total_raised
-    })
 
 
-
-# Adjusting the add_general_transaction function
 def add_general_transaction(request):
     if request.method == 'POST':
         form = TransactionForm(request.POST)
@@ -99,12 +84,11 @@ def add_general_transaction(request):
                 transaction.amount = -transaction.amount  # If the transaction is debit, make the amount negative.
             transaction.save()
             messages.success(request, 'General transaction added successfully.')
-            return redirect('home')
+            return redirect('add_general_transaction')  # Redirect to refresh the page and clear fields.
     else:
         form = TransactionForm()
     return render(request, 'main/add_general_transaction.html', {'form': form})
 
-# Adjusting the add_project_transaction function
 def add_project_transaction(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     if request.method == 'POST':
@@ -117,18 +101,27 @@ def add_project_transaction(request, project_id):
                 transaction.amount = -transaction.amount  # If the transaction is debit, make the amount negative.
             transaction.save()
             messages.success(request, f'Transaction added successfully to {project.name}.')
-            return redirect('home')
+            return redirect('add_project_transaction', project_id=project.id)  # Redirect to refresh the page and clear fields.
     else:
         form = TransactionForm()
     return render(request, 'main/add_project_transaction.html', {'form': form, 'project': project})
 
-# Updating the view transactions report page to reflect the debit color change
-def view_general_transactions(request):
-    transactions = Transaction.objects.filter(fund="general").annotate(
-        amount_color=Sum('amount')
-    )
-    return render(request, 'main/view_general_transactions.html', {'transactions': transactions})
 
+
+def view_project_transactions(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    transactions = project.transactions.all()
+    total_raised = transactions.aggregate(Sum('amount'))['amount__sum'] or 0
+    return render(request, 'main/view_project_transactions.html', {
+        'project': project,
+        'transactions': transactions,
+        'total_raised': total_raised
+    })
+
+
+def view_general_transactions(request):
+    transactions = Transaction.objects.filter(fund="general")
+    return render(request, 'main/view_general_transactions.html', {'transactions': transactions})
 
 
 
