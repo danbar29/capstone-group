@@ -16,7 +16,8 @@ def donations(request):
     return render(request, 'main/donations.html')
 
 def trends(request):
-    return render(request, 'main/trends.html')
+    transactions = Transaction.objects.filter(fund="general")
+    return render(request, 'main/trends.html', {'transactions': transactions})
 
 
 def sign_up(request):
@@ -122,11 +123,3 @@ def view_project_transactions(request, project_id):
 def view_general_transactions(request):
     transactions = Transaction.objects.filter(fund="general")
     return render(request, 'main/view_general_transactions.html', {'transactions': transactions})
-
-
-
-
-
-
-
-
