@@ -30,7 +30,7 @@
     <script>
         function downloadTableAsCSV() {
             const table = document.getElementById("transactions");
-            let csvContent = "";
+            let csvContent = "General Fund Transactions\n\n";
 
             // Get table headers
             const headers = Array.from(table.querySelectorAll("thead th"))
@@ -56,7 +56,7 @@
             // Create a temporary link and trigger the download
             const a = document.createElement("a");
             a.href = url;
-            a.download = "transactions.csv";
+            a.download = "General Transactions.csv";
             document.body.appendChild(a);
             a.click();
 
