@@ -16,7 +16,8 @@ def donations(request):
     return render(request, 'main/donations.html')
 
 def trends(request):
-    return render(request, 'main/trends.html')
+    transactions = Transaction.objects.filter(fund="general")
+    return render(request, 'main/trends.html', {'transactions': transactions})
 
 
 def sign_up(request):
@@ -122,22 +123,3 @@ def view_project_transactions(request, project_id):
 def view_general_transactions(request):
     transactions = Transaction.objects.filter(fund="general")
     return render(request, 'main/view_general_transactions.html', {'transactions': transactions})
-
-
-def edit_project(request, project_id):
-    project = get_object_or_404(Project, id=project_id, owner=request.user)
-    if request.method == 'POST':
-        form = ProjectForm(request.POST, instance=project)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Project updated successfully.')
-            return redirect('home')
-    else:
-        form = ProjectForm(instance=project)
-    return render(request, 'main/edit_project.html', {'form': form, 'project': project})
-
-
-
-
-
-

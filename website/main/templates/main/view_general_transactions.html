@@ -4,29 +4,72 @@
 <div class="container mt-4">
     <h2>General Transactions</h2>
     {% if transactions %}
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Donor Name</th>
-                    <th>Amount</th>
-                    <th>Type</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for transaction in transactions %}
-                <tr>
-                    <td>{{ transaction.donor_name }}</td>
-                    <td>${{ transaction.amount }}</td>
-                    <td>{{ transaction.transaction_type }}</td>
-                    <td>{{ transaction.date }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <table id="transactions" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Donor Name</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.donor_name }}</td>
+                <td>${{ transaction.amount }}</td>
+                <td>{{ transaction.transaction_type }}</td>
+                <td>{{ transaction.date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <button onclick="downloadTableAsCSV()" class="btn btn-secondary mt-3">Download Transactions as CSV</button>
+
+    <script>
+        function downloadTableAsCSV() {
+            const table = document.getElementById("transactions");
+            let csvContent = "General Fund Transactions\n\n";
+
+            // Get table headers
+            const headers = Array.from(table.querySelectorAll("thead th"))
+                .map(header => header.textContent.trim())
+                .join(",");
+            csvContent += headers + "\n";
+
+            // Get table rows and remove any non-numeric characters from Amount
+            const rows = Array.from(table.querySelectorAll("tbody tr"));
+            rows.forEach(row => {
+                const rowData = Array.from(row.querySelectorAll("td")).map((cell, index) => {
+                    let cellContent = cell.textContent.trim();
+
+                    return `"${cellContent}"`; // Enclose each cell content in double quotes
+                }).join(",");
+                csvContent += rowData + "\n";
+            });
+
+            // Create a Blob from the CSV string
+            const blob = new Blob([csvContent], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+
+            // Create a temporary link and trigger the download
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "General Transactions.csv";
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
     {% else %}
-        <p>No transactions found.</p>
+    <p>No transactions found.</p>
     {% endif %}
-    <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back to Home</a>
+    <div id="homebutton">
+        <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back to Home</a>
+    </div>
 </div>
 {% endblock %}

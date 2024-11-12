@@ -5,7 +5,7 @@
     <h2>Transactions for {{ project.name }}</h2>
     <p>Goal: ${{ project.goal_amount }}</p>
     <p>Raised So Far: ${{ total_raised }}</p>
-    <table class="table table-striped mt-3">
+    <table id="transactionsTable" class="table table-striped mt-3">
         <thead>
             <tr>
                 <th>Date</th>
@@ -29,7 +29,59 @@
             {% endfor %}
         </tbody>
     </table>
-    <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back</a>
+
+    <button onclick="downloadProjectTransactionsAsCSV()" class="btn btn-secondary mt-3">Download Transactions as CSV</button>
+
+    <script>
+        function downloadProjectTransactionsAsCSV() {
+            const table = document.getElementById("transactionsTable");
+            let csvContent = "";
+
+            // Include project details at the top of the CSV
+            const projectName = "{{ project.name }}";
+            const goalAmount = "{{ project.goal_amount }}";
+            const totalRaised = "{{ total_raised }}";
+
+            csvContent += `Project Name:,${projectName}\n`;
+            csvContent += `Goal:,"$${goalAmount}"\n`;
+            csvContent += `Total Raised:,"$${totalRaised}"\n\n`;
+
+            // Get table headers
+            const headers = Array.from(table.querySelectorAll("thead th"))
+                                 .map(header => header.textContent.trim())
+                                 .join(",");
+            csvContent += headers + "\n";
+
+            // Get table rows and process data
+            const rows = Array.from(table.querySelectorAll("tbody tr"));
+            rows.forEach(row => {
+                const rowData = Array.from(row.querySelectorAll("td")).map((cell, index) => {
+                    let cellContent = cell.textContent.trim();
+
+                    return `"${cellContent}"`; // Enclose each cell content in double quotes
+                }).join(",");
+                csvContent += rowData + "\n";
+            });
+
+            // Create a Blob from the CSV string
+            const blob = new Blob([csvContent], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+
+            // Create a temporary link and trigger the download
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "Project Specific Transactions.csv";
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+    <div id="backbutton">
+        <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back</a>
+    </div>
 </div>
 {% endblock %}
 

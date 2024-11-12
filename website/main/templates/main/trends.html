@@ -1,6 +1,99 @@
-{% extends 'main/base.html' %}
+﻿{% extends 'main/base.html' %}
 
 {% block title %}Donations Trends{% endblock %}
 {% block content %}
-<h1>This is where graphical donation trends will be displayed</h1>
+<div>
+    <h2>General Transactions</h2>
+    {% if transactions %}
+    <table id="transactions" style="display:none;">
+        <!---->
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.date }}</td>
+                <td>${{ transaction.amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div id="container"></div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script type="module">
+        const rawData = d3.select("#transactions")
+            .selectAll("tbody tr")
+            .nodes()
+            .map(row => {
+                const cells = d3.select(row).selectAll("td").nodes();
+                return {
+                    date: new Date(cells[0].textContent),
+                    value: +cells[1].textContent
+                };
+            });
+
+        const tableData = [];
+        let donationTotal = 0;
+
+        rawData.forEach(transaction => {
+            donationTotal += transaction.value;
+            tableData.push({
+                date: transaction.date,
+                value: donationTotal
+            });
+        });
+
+        const width = 640;
+        const height = 400;
+        const marginTop = 20;
+        const marginRight = 20;
+        const marginBottom = 30;
+        const marginLeft = 40;
+
+        // Create SVG and group for the graph
+        const svg = d3.select("#container").append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", `translate(${marginLeft},${marginTop})`);
+
+        // Create scales
+        const xScale = d3.scaleUtc()
+            .domain(d3.extent(tableData, d => d.date))
+            .range([0, width]);
+
+        const yScale = d3.scaleLinear()
+            .domain([0, d3.max(tableData, d => d.value)])
+            .range([height, 0]);
+
+        // Create line generator
+        const line = d3.line()
+            .x(d => xScale(d.date))
+            .y(d => yScale(d.value));
+
+        // Append the line path
+        svg.append("path")
+            .datum(tableData)
+            .attr("class", "line")
+            .attr("d", line);
+
+        // Add X axis
+        svg.append("g")
+            .call(d3.axisBottom(xScale));
+
+        // Add Y axis
+        svg.append("g")
+            .call(d3.axisLeft(yScale));
+    </script>
+
+    {% else %}
+    <p>No transactions found.</p>
+    {% endif %}
+</div>
+<a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back to Home</a>
 {% endblock %}
