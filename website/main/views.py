@@ -65,7 +65,7 @@ def create_project(request):
         if form.is_valid():
             project = form.save(commit=False)  # Not saving yet to fetch the user.
             project.owner = request.user
-            project.save()  # Now we push it to the database with the associated user.
+            project.save()  # push it to the database with the associated user.
             messages.success(request, 'Project created successfully.')
             return redirect('create_project')  # Redirect to refresh the page and clear fields.
     else:
@@ -124,6 +124,17 @@ def view_general_transactions(request):
     return render(request, 'main/view_general_transactions.html', {'transactions': transactions})
 
 
+def edit_project(request, project_id):
+    project = get_object_or_404(Project, id=project_id, owner=request.user)
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Project updated successfully.')
+            return redirect('home')
+    else:
+        form = ProjectForm(instance=project)
+    return render(request, 'main/edit_project.html', {'form': form, 'project': project})
 
 
 
