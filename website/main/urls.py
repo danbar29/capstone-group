@@ -18,6 +18,7 @@ urlpatterns = [
     path('edit-project/<int:project_id>/', views.edit_project, name='edit_project'),
     path('archive-project/<int:project_id>/', views.archive_project, name='archive_project'),
     path('archived-projects/', views.archived_projects, name='archived_projects'),
+    path('restore-project/<int:project_id>/', views.restore_project, name='restore_project'),
 
 
 

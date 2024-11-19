@@ -153,13 +153,23 @@ def archived_projects(request):
     # Retrieve all archived projects
     archived_projects_list = Project.objects.filter(is_archived=True)
 
-    # Prepare project data with the total raised amount
+    # Prepare project data with the total raised amount and progress percentage
     project_data = []
     for project in archived_projects_list:
         total_raised = project.transactions.aggregate(Sum('amount'))['amount__sum'] or 0
+        progress_percentage = (total_raised / project.goal_amount * 100) if project.goal_amount > 0 else 0
         project_data.append({
             'project': project,
-            'total_raised': total_raised
+            'total_raised': total_raised,
+            'progress_percentage': progress_percentage
         })
 
     return render(request, 'main/archived_projects.html', {'archived_projects': project_data})
+
+# Function to restore an archived project
+def restore_project(request, project_id):
+    project = Project.objects.get(id=project_id)
+    if project and project.is_archived:
+        project.is_archived = False
+        project.save()
+        return redirect('home')  # Redirect back to home page after restoring
