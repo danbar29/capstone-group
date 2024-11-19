@@ -1,3 +1,4 @@
+
 {% extends 'main/base.html' %}
 
 {% block title %}Archived Projects{% endblock %}
@@ -23,8 +24,10 @@
 
             <!-- Button Group for Actions -->
             <div class="btn-group">
-                <!-- Restore Button -->
-                <a href="{% url 'restore_project' data.project.id %}" class="btn btn-warning">Restore Project</a>
+                <!-- Restore Button (Visible only to project owner) -->
+                {% if data.project.owner == user %}
+                    <a href="{% url 'restore_project' data.project.id %}" class="btn btn-warning">Restore Project</a>
+                {% endif %}
 
                 <!-- View Transactions Button -->
                 <a href="{% url 'view_project_transactions' data.project.id %}" class="btn btn-primary" style="background-color: #069393eb; color: white !important;">View Transactions</a>
@@ -36,6 +39,4 @@
     {% endif %}
 </div>
 {% endblock %}
-
-
 
