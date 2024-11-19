@@ -4,19 +4,20 @@
 {% block content %}
 <div class="container mt-4">
     <h2>General Donations</h2>
-    <div class="card p-3">
+    <div class="card p-3" style="background-color: #b3e7e4;">
         <p>General Donations Total: ${{ general_total }}</p>
         <div class="btn-group">
-            <a href="{% url 'view_general_transactions' %}" class="btn btn-primary">View Transactions</a>
-            <a href="{% url 'add_general_transaction' %}" class="btn btn-success">Add Transaction</a>
+            <a href="{% url 'view_general_transactions' %}" class="btn btn-primary" class="btn" style="background-color: #069393eb; color: white !important;" >View Transactions</a>
+            <a href="{% url 'add_general_transaction' %}" class="btn btn-success"  style="background-color: #2885a7; color: rgb(255, 255, 255) !important;">Add Transaction</a>
         </div>
     </div>
 
     <h2 class="mt-5">Specific Projects</h2>
-    <a href="{% url 'create_project' %}" class="btn btn-primary mb-3">Create New Project</a>
+    <a href="{% url 'create_project' %}" class="btn btn-primary mb-3"style="background-color: #6c757d; color: white !important;">Create New Project</a> 
+</div>
 
     {% for data in project_data %}
-    <div class="card p-3 mb-3 position-relative" style="padding-top: 2.5rem;">
+    <div class="card p-3 mb-3 position-relative" style="background-color: #b1e7e3;" style="padding-top: 2.5rem ;">
         {% if data.is_owner %}
         <a href="{% url 'edit_project' data.project.id %}" class="btn btn-sm btn-warning" style="position: absolute; top: 10px; right: 10px;">Edit</a>
         {% endif %}
@@ -27,7 +28,7 @@
         <!-- Progress Bar -->
         <div class="progress mb-3">
             <div class="progress-bar" role="progressbar"
-                 style="width: {{ data.progress_percentage }}%;"
+                 style="width: {{ data.progress_percentage }}%;
                  aria-valuenow="{{ data.progress_percentage }}" aria-valuemin="0" aria-valuemax="100">
                 {{ data.progress_percentage }}%
             </div>
@@ -35,9 +36,9 @@
 
         <div class="btn-group">
 
-            <a href="{% url 'view_project_transactions' data.project.id %}" class="btn btn-primary">View Transactions</a>
+            <a href="{% url 'view_project_transactions' data.project.id %}" class="btn btn-primary"  style="background-color: #069393eb; color: white !important;">View Transactions</a>
             {% if data.is_owner %}
-            <a href="{% url 'add_project_transaction' data.project.id %}" class="btn btn-success">Add Transaction</a>
+            <a href="{% url 'add_project_transaction' data.project.id %}" class="btn btn-success" style="background-color: #2885a7; color: rgb(255, 255, 255) !important;">Add Transaction</a>
 
             {% endif %}
         </div>
