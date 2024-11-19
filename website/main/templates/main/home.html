@@ -20,6 +20,7 @@
     <div class="card p-3 mb-3 position-relative" style="background-color: #b1e7e3;" style="padding-top: 2.5rem ;">
         {% if data.is_owner %}
         <a href="{% url 'edit_project' data.project.id %}" class="btn btn-sm btn-warning" style="position: absolute; top: 10px; right: 10px;">Edit</a>
+        <a href="{% url 'archive_project' data.project.id %}" class="btn btn-sm btn-danger" style="position: absolute; top: 50px; right: 10px;" onclick="return confirm('Are you sure you want to archive this project?');">Archive</a>
         {% endif %}
         <h4>{{ data.project.name }}</h4>
         <p>Goal: ${{ data.project.goal_amount }}</p>

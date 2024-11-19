@@ -38,7 +38,9 @@ def sign_up(request):
 
 def home(request):
     general_total = Transaction.objects.filter(fund="general").aggregate(Sum('amount'))['amount__sum'] or 0
-    projects = Project.objects.all()
+    
+    # Only show non-archived projects
+    projects = Project.objects.filter(is_archived=False) #projects = Project.objects.all()
     
     # Prepare projects with their total donations and calculate progress
     project_data = []
@@ -125,7 +127,6 @@ def view_general_transactions(request):
     return render(request, 'main/view_general_transactions.html', {'transactions': transactions})
 
 
-
 def edit_project(request, project_id):
     project = get_object_or_404(Project, id=project_id, owner=request.user)
     if request.method == 'POST':
@@ -137,3 +138,28 @@ def edit_project(request, project_id):
     else:
         form = ProjectForm(instance=project)
     return render(request, 'main/edit_project.html', {'form': form, 'project': project})
+
+def archive_project(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    if project.owner == request.user:
+        project.is_archived = True
+        project.save()
+        return redirect('home')  # Redirect to the homepage after archiving
+    else:
+        return redirect('home')  # Redirect if the user does not own the project
+    
+
+def archived_projects(request):
+    # Retrieve all archived projects
+    archived_projects_list = Project.objects.filter(is_archived=True)
+
+    # Prepare project data with the total raised amount
+    project_data = []
+    for project in archived_projects_list:
+        total_raised = project.transactions.aggregate(Sum('amount'))['amount__sum'] or 0
+        project_data.append({
+            'project': project,
+            'total_raised': total_raised
+        })
+
+    return render(request, 'main/archived_projects.html', {'archived_projects': project_data})

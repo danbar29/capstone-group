@@ -26,6 +26,8 @@ class Project(models.Model):
     goal_amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(null=True, blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_archived = models.BooleanField(default=False)
+
 
     def __str__(self):
         return self.name

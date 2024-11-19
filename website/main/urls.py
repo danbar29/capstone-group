@@ -16,6 +16,9 @@ urlpatterns = [
     path('project-transactions/<int:project_id>/', views.view_project_transactions, name='view_project_transactions'),
     path('add-project-transaction/<int:project_id>/', views.add_project_transaction, name='add_project_transaction'),
     path('edit-project/<int:project_id>/', views.edit_project, name='edit_project'),
+    path('archive-project/<int:project_id>/', views.archive_project, name='archive_project'),
+    path('archived-projects/', views.archived_projects, name='archived_projects'),
+
 
 
 ]
