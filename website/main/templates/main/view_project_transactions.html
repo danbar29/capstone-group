@@ -30,7 +30,10 @@
         </tbody>
     </table>
 
-    <button onclick="downloadProjectTransactionsAsCSV()" class="btn btn-secondary mt-3">Download Transactions as CSV</button>
+    <div class="button-container">
+        <button onclick="downloadTableAsCSV()" class="btn btn-secondary mt-3">Download as CSV</button>
+        <button onclick="downloadTableAsPDF()" class="btn btn-secondary mt-3">Download as PDF</button>
+    </div>
 
     <script>
         function downloadProjectTransactionsAsCSV() {
@@ -79,10 +82,72 @@
             URL.revokeObjectURL(url);
         }
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        function downloadTableAsPDF() {
+            // Import jsPDF
+            const { jsPDF } = window.jspdf;
+
+            // Create a new jsPDF instance
+            const doc = new jsPDF();
+
+            // Add title
+            doc.text("Project Specific Transactions", 70, 15);
+
+            let currentY = 25
+
+            // Define project details
+            const projectName = "{{ project.name }}";
+            const projectGoal = "${{ project.goal_amount }}";
+            const totalRaised = "${{ total_raised }}";
+
+            // Add project details at the top of the PDF
+            doc.setFontSize(16);
+            doc.text(`Project: ${projectName}`, 14, currentY); // Title
+            currentY += 8;
+
+            doc.setFontSize(12);
+            doc.text(`Goal: ${projectGoal}`, 14, currentY); // Goal
+            currentY += 7;
+            doc.text(`Raised So Far: ${totalRaised}`, 14, currentY); // Raised So Far
+
+            currentY += 10
+
+            // Get table element
+            const table = document.getElementById("transactionsTable");
+
+            if (!table) {
+                console.error("Table with id 'transactions' not found!");
+                return;
+            }
+
+            // Extract headers
+            const headers = Array.from(table.querySelectorAll("thead th")).map(th => th.textContent.trim());
+
+            // Extract data from rows
+            const data = Array.from(table.querySelectorAll("tbody tr")).map(tr => {
+                return Array.from(tr.querySelectorAll("td")).map(td => td.textContent.trim());
+            });
+
+            // Add table using autoTable
+            doc.autoTable({
+                head: [headers],
+                body: data,
+                startY: currentY,
+                styles: {
+                    head: { fillColor: [95, 140, 166] }, // Customize header color
+                    halign: 'left',
+                },
+            });
+
+            // Save the PDF
+            doc.save("Project Specific Transactions.pdf");
+        };
+    </script>
     <div id="backbutton">
-        <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Home</a>
+        <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back</a>
     </div>
 </div>
 {% endblock %}
-
-

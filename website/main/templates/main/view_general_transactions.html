@@ -4,7 +4,7 @@
 <div class="container mt-4">
     <h2>General Transactions</h2>
     {% if transactions %}
-    <table id="transactions" class="table table-striped">
+    <table id="transactionsTable" class="table table-striped">
         <thead>
             <tr>
                 <th>Donor Name</th>
@@ -24,12 +24,13 @@
             {% endfor %}
         </tbody>
     </table>
-
-    <button onclick="downloadTableAsCSV()" class="btn btn-secondary mt-3">Download Transactions as CSV</button>
-
+    <div class="button-container">
+        <button onclick="downloadTableAsCSV()" class="btn btn-secondary mt-3">Download as CSV</button>
+        <button onclick="downloadTableAsPDF()" class="btn btn-secondary mt-3">Download as PDF</button>
+    </div>
     <script>
         function downloadTableAsCSV() {
-            const table = document.getElementById("transactions");
+            const table = document.getElementById("transactionsTable");
             let csvContent = "General Fund Transactions\n\n";
 
             // Get table headers
@@ -64,6 +65,52 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        function downloadTableAsPDF() {
+            // Import jsPDF
+            const { jsPDF } = window.jspdf;
+
+            // Create a new jsPDF instance
+            const doc = new jsPDF();
+
+            // Get table element
+            const table = document.getElementById("transactionsTable");
+
+            if (!table) {
+                console.error("Table with id 'transactions' not found!");
+                return;
+            }
+
+            // Extract headers
+            const headers = Array.from(table.querySelectorAll("thead th")).map(th => th.textContent.trim());
+
+            // Extract data from rows
+            const data = Array.from(table.querySelectorAll("tbody tr")).map(tr => {
+                return Array.from(tr.querySelectorAll("td")).map(td => td.textContent.trim());
+            });
+
+            // Add title
+            doc.text("General Fund Transactions", 14, 15);
+
+            // Add table using autoTable
+            doc.autoTable({
+                head: [headers],
+                body: data,
+                startY: 20,
+                styles: {
+                    head: { fillColor: [95, 140, 166] }, // Customize header color
+                    halign: 'left',
+                },
+            });
+
+            // Save the PDF
+            doc.save("General Transactions.pdf");
+        };
     </script>
     {% else %}
     <p>No transactions found.</p>
