@@ -112,6 +112,111 @@
             doc.save("General Transactions.pdf");
         };
     </script>
+
+    <div id="graph"></div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const table = document.getElementById("transactionsTable");
+            //table.style.display = "none"; // Show table after sorting
+
+            // Sort function for the "Date" column (first column)
+            function sortTableByDate() {
+                const rows = Array.from(table.querySelectorAll("tbody tr"));
+                rows.sort((a, b) => {
+                    const dateA = new Date(a.cells[3].textContent);
+                    const dateB = new Date(b.cells[3].textContent);
+                    return dateA - dateB;
+                });
+
+                // Append rows in sorted order
+                rows.forEach(row => table.querySelector("tbody").appendChild(row));
+            }
+
+            sortTableByDate();
+
+            // Set a new identifier for the sorted table
+            table.setAttribute("id", "sortedTransactions");
+
+            // Now we can safely reference "sortedTransactions"
+            var donationTotal = 0;
+
+            const sortedTable = document.getElementById("sortedTransactions");
+            const rows = Array.from(sortedTable.querySelectorAll("tbody tr"));
+            const data = rows.map(row => {
+                const date = row.cells[3].innerText;
+                const amount = parseFloat(row.cells[1].innerText.replace('$', ''));
+                donationTotal += amount;
+                return { date: new Date(date), amount: donationTotal };
+            });
+
+            // Set up dimensions and margins
+            const margin = { top: 20, right: 30, bottom: 85, left: 60 };
+            const width = 1000 - margin.left - margin.right;
+            const height = 650 - margin.top - margin.bottom;
+
+            // Create SVG container
+            const svg = d3.select("#graph")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // Set up scales
+            const x = d3.scaleTime()
+                .domain(d3.extent(data, d => d.date))
+                .range([0, width]);
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.amount)])
+                .range([height, 0]);
+
+            // Create line generator
+            const line = d3.line()
+                .x(d => x(d.date))
+                .y(d => y(d.amount));
+
+            // Add X and Y axes
+            svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x).ticks(5).tickFormat(d3.timeFormat("%Y-%m-%d")))
+                .selectAll("text")
+                .attr("transform", "rotate(-45)")
+                .style("text-anchor", "end");
+
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+            // Add labels for axes
+
+            svg.append("text")
+                .attr("text-anchor", "end")
+                .attr("x", -margin.top)
+                .attr("y", -margin.left + 15)
+                .attr("transform", "rotate(-90)")
+                .text("Total Amount in Fund (USD)")
+                .style("fill", "black")
+                .style("font-size", "12px");
+
+            svg.append("text")
+                .attr("text-anchor", "end")
+                .attr("x", (width / 2) + 35)
+                .attr("y", height + margin.bottom - 10)
+                .text("Date of Transaction")
+                .style("fill", "black")
+                .style("font-size", "12px");
+
+            // Add line path
+            svg.append("path")
+                .datum(data)
+                .attr("fill", "none")
+                .attr("stroke", "steelblue")
+                .attr("stroke-width", 2.5)
+                .attr("d", line);
+        });
+    </script>
     {% else %}
     <p>No transactions found.</p>
     {% endif %}
