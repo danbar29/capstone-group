@@ -133,7 +133,6 @@ def edit_project(request, project_id):
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Project updated successfully.')
             return redirect('home')
     else:
         form = ProjectForm(instance=project)
