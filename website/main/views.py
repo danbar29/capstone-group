@@ -5,15 +5,14 @@ from django.contrib.auth import login,logout, authenticate
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Sum
+from django.core.mail import send_mail
+from django.contrib import messages
 #from django.contrib.auth.decorators import login_required #if we want to go with decorators we could add @login_required
 
 # Create your views here.
 def log_out(request):
     logout(request)
     return redirect("/login/")
-
-def donations(request):
-    return render(request, 'main/donations.html')
 
 def trends(request):
     transactions = Transaction.objects.filter(fund="general")
@@ -172,3 +171,30 @@ def restore_project(request, project_id):
         project.is_archived = False
         project.save()
         return redirect('home')  # Redirect back to home page after restoring
+
+def contacts(request):
+
+    if request.method == 'POST':
+        name  = request.POST["name"]
+        email = request.POST["email"]
+        subject = request.POST["subject"]
+        message = request.POST["message"]
+
+        try:
+            
+            send_mail(
+                subject,
+                message,
+                email,
+                ['fowardfund@gmail.com'],
+                fail_silently=False,
+            )
+            messages.success(request,'Your email has been sent successfully')
+            return render(request, 'main/contact.html')
+        except Exception as e:
+            messages.error(request, f'an error occured')
+
+
+        print(name, email, subject, message)
+
+    return render(request, 'main/contact.html')
