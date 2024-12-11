@@ -1,7 +1,5 @@
 {% extends 'main/base_for_contact.html' %}
 
-
-
 <form name="sentMessage" method="post" action="#">
     {% csrf_token %}
     <div class="control-group">
@@ -21,11 +19,9 @@
         <p class="help-block text-danger"></p>
     </div>
 
-
     <div class="text-center">
         <button class="btn btn-primary py-3 px-5" type="submit" id="sendMessageButton">Send Message</button>
     </div>
-
 
 </form>
 
